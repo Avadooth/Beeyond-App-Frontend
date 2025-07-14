@@ -1,0 +1,38 @@
+frontend/
+│   ├── public/
+│   │   └── index.html             # Root HTML template
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── OrderCard.jsx
+│   │   ├── pages/
+│   │   │   ├── CustomerDashboard.jsx
+│   │   │   ├── DeliveryDashboard.jsx
+│   │   │   ├── AdminPanel.jsx
+│   │   │   └── LoginPage.jsx
+│   │   ├── services/
+│   │   │   ├── api.js             # Axios setup
+│   │   │   ├── authService.js     # JWT auth logic
+│   │   └── App.js                 # Route entry point
+│   ├── nginx/
+│   │   └── default.conf           # Nginx config for reverse proxy
+│   ├── Dockerfile                 # Dockerfile for frontend build
+│   └── vite.config.js             # Or next.config.js if using Next.js
+│
+├── .env                           # Shared environment variables
+├── docker-compose.yml             # Orchestration of all services
+└── README.md                      # Full documentation
+
+
+I have a basic React component styled with inline CSS or minimal Tailwind classes. Rewrite it in a production-grade style that mimics the visual and interactive design of https://www.beeyond.agency. Follow these exact rules:
+
+1. Use Tailwind CSS utility classes for layout, spacing, typography, and colors.
+2. Apply a modern **dark mode theme**: backgrounds like `bg-gray-900`, `bg-black`, and `text-white`.
+3. Add clean, bold typography using `text-4xl`, `font-extrabold`, `tracking-wide`, etc.
+4. Use elegant gradient accents like `bg-gradient-to-r from-purple-600 to-blue-400` where suitable.
+5. Add hover effects such as `hover:scale-105`, `hover:shadow-xl`, and `transition-all duration-300`.
+6. Make the layout fully responsive using Tailwind’s grid and flex utilities.
+7. Add smooth **scroll-triggered animations** using **Framer Motion** (or Intersection Observer).
+8. Replace generic HTML elements with semantic and accessible markup.
+9. Output only clean, modern JSX with Tailwind classes, no inline styles.
+10. Maintain accessibility (alt tags, semantic tags, keyboard-friendly buttons).
