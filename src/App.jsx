@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import DeliveryDashboard from "./pages/DeliveryDashboard";
+import ProductCatalog from "./pages/ProductCatalog";
 import AdminPanel from "./pages/AdminPanel";
 import SignupPage from "./pages/SignupPage";
 import PrivateRoute from "./components/PrivateRoute";
@@ -30,7 +31,15 @@ function App() {
               <Route path="/signup" element={<SignupPage />} />
 
               <Route
-                path="/customer"
+                path="/ProductCatalog"
+                element={
+                  <PrivateRoute allowedRoles={["customer"]}>
+                    <ProductCatalog />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/Tracking"
                 element={
                   <PrivateRoute allowedRoles={["customer"]}>
                     <CustomerDashboard />

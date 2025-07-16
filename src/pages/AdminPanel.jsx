@@ -1,48 +1,103 @@
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import api from '../services/api';
+import socket from '../socket';
+import { motion } from 'framer-motion';
 
-export default function AdminPanel() {
+export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
+  const [partners, setPartners] = useState([]);
 
   useEffect(() => {
-    api.get('/orders').then(res => setOrders(res.data));
+    // Fetch all orders
+    api.get('/admin/orders').then(res => {
+      setOrders(res.data);
+      console.log('📦 Orders fetched:', res.data);
+      res.data.forEach(order => {
+        socket.emit('joinOrderRoom', { orderId: order._id });
+      });
+    });
+
+    // Fetch delivery partners
+    api.get('/admin/partners').then(res => setPartners(res.data));
+
+    // Socket listener for status updates
+    socket.on('orderStatusUpdate', ({ orderId, status }) => {
+      setOrders(prev =>
+        prev.map(order =>
+          order._id === orderId ? { ...order, status } : order
+        )
+      );
+    });
+
+    return () => {
+      socket.off('orderStatusUpdate');
+    };
   }, []);
 
   return (
-    <section className="min-h-screen bg-gray-900 text-white py-16 px-4 sm:px-8">
+    <section className="bg-gray-900 text-white min-h-screen py-10 px-6">
       <motion.div
         initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
-        className="max-w-6xl mx-auto"
+        className="max-w-7xl mx-auto"
       >
-        <h2 className="text-4xl sm:text-5xl font-extrabold tracking-wide mb-10 text-center">
-          Admin Panel
-        </h2>
+        <h1 className="text-4xl font-bold text-center mb-10 bg-gradient-to-r from-purple-500 to-blue-400 bg-clip-text text-transparent">
+          Admin Dashboard
+        </h1>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {orders.map(order => (
-            <motion.article
-              key={order._id}
-              className="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300"
-              whileHover={{ scale: 1.03 }}
-            >
-              <h3 className="text-xl font-bold mb-2 text-gradient bg-gradient-to-r from-purple-500 to-blue-400 bg-clip-text text-transparent">
-                Order: {order._id}
-              </h3>
-              <p className="text-gray-300">
-                <span className="font-semibold text-white">Status:</span> {order.status}
-              </p>
-              <p className="text-gray-300 mt-1">
-                <span className="font-semibold text-white">Customer:</span> {order.customerId?.name || 'N/A'}
-              </p>
-              <p className="text-gray-300 mt-1">
-                <span className="font-semibold text-white">Partner:</span> {order.partnerId?.name || 'Unassigned'}
-              </p>
-            </motion.article>
-          ))}
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold mb-4 text-purple-400">📦 Live Orders</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-700">
+              <thead>
+                <tr className="bg-gray-800 text-left">
+                  <th className="px-4 py-2">Order ID</th>
+                  <th className="px-4 py-2">Product</th>
+                  <th className="px-4 py-2">Customer</th>
+                  <th className="px-4 py-2">Partner</th>
+                  <th className="px-4 py-2">Status</th>
+                  <th className="px-4 py-2">Updated At</th>
+                </tr>
+              </thead>
+              <tbody>
+                {orders.map(order => (
+                  <tr key={order._id} className="border-t border-gray-700">
+                    <td className="px-4 py-2">{order._id.slice(-6).toUpperCase()}</td>
+                    <td className="px-4 py-2">{order.productName}</td>
+                    <td className="px-4 py-2">{order.customerId?.name || 'N/A'}</td>
+                    <td className="px-4 py-2">{order.partnerId?.name || 'Unassigned'}</td>
+                    <td className="px-4 py-2 capitalize">{order.status}</td>
+                    <td className="px-4 py-2">{new Date(order.updatedAt).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div>
+          <h2 className="text-2xl font-semibold mb-4 text-green-400">🛵 Delivery Partners</h2>
+          <div className="overflow-x-auto">
+            <table className="min-w-full border border-gray-700">
+              <thead>
+                <tr className="bg-gray-800 text-left">
+                  <th className="px-4 py-2">Name</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Role</th>
+                </tr>
+              </thead>
+              <tbody>
+                {partners.map(partner => (
+                  <tr key={partner._id} className="border-t border-gray-700">
+                    <td className="px-4 py-2">{partner.name}</td>
+                    <td className="px-4 py-2">{partner.email}</td>
+                    <td className="px-4 py-2">{partner.role}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </motion.div>
     </section>

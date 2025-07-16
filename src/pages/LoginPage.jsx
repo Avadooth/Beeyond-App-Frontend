@@ -1,18 +1,27 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/authService";
+import { login as loginService } from "../services/authService"; // ✅ Rename here
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ Don't forget this import
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+  const { login: setUserInContext } = useAuth(); // ✅ rename to avoid conflict
 
   const handleLogin = async () => {
     try {
-      await login(email, password);
-      navigate("/customer");
+      const user = await loginService(email, password); // decoded token
+      setUserInContext(user); // store user in context
+      console.log("User logged in:", user);
+
+      // 🔁 Redirect based on role
+      if (user.role === "admin") navigate("/admin");
+      else if (user.role === "partner") navigate("/delivery");
+      else if (user.role === "customer") navigate("/ProductCatalog");
+      else navigate("/");
     } catch (err) {
       alert("Login failed");
     }
@@ -80,6 +89,7 @@ export default function LoginPage() {
             Sign In
           </button>
         </form>
+
         <p className="text-sm text-center text-gray-400 mt-4">
           Don't have an account?{" "}
           <Link to="/signup" className="text-blue-400 hover:underline">

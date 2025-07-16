@@ -1,43 +1,80 @@
-import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
-  const { pathname } = useLocation();
+  const { user, logout } = useAuth();
+  console.log("Navbar user:", user);
+  const navigate = useNavigate();
 
-  const navItems = [
-    { label: 'Home', to: '/' },
-    { label: 'Customer', to: '/customer' },
-    { label: 'Delivery', to: '/delivery' },
-    { label: 'Admin', to: '/admin' },
-  ];
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
+
+  const handleBrandClick = () => {
+    if (user) {
+      const confirmLogout = window.confirm("Do you want to logout?");
+      if (confirmLogout) {
+        handleLogout();
+      }
+    } else {
+      navigate("/"); // if not logged in
+    }
+  };
 
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="w-full bg-gray-900 text-white shadow-md"
-    >
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="text-2xl font-extrabold tracking-wide">
-          Beeyond<span className="text-purple-400">UI</span>
-        </div>
-        <ul className="flex space-x-6 text-sm sm:text-base font-medium">
-          {navItems.map(({ label, to }) => (
-            <li key={to}>
-              <Link
-                to={to}
-                className={`relative group transition-all duration-300 ${
-                  pathname === to ? 'text-purple-400' : 'text-white hover:text-purple-400'
-                }`}
+    <nav className="bg-gray-900 text-white px-6 py-4 shadow-md">
+      <div className="max-w-6xl mx-auto flex justify-between items-center">
+        <button
+          onClick={handleBrandClick}
+          className="text-xl font-bold tracking-wide focus:outline-none"
+        >
+          Beeyond<span className="text-purple-500">App</span>
+        </button>
+
+        {user && (
+          <ul className="flex space-x-6 text-sm sm:text-base font-medium items-center">
+            {user.role === "customer" && (
+              <>
+                <li>
+                  <Link
+                    to="/ProductCatalog"
+                    className="hover:text-purple-400 transition"
+                  >
+                    Product Catalog
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/Tracking"
+                    className="hover:text-purple-400 transition"
+                  >
+                    Track Your Product
+                  </Link>
+                </li>
+              </>
+            )}
+
+            {user.role === "admin" && (
+              <li>
+                <Link to="/admin" className="hover:text-purple-400 transition">
+                  Admin Panel
+                </Link>
+              </li>
+            )}
+
+            {/* ✅ Common Logout for all roles */}
+            <li>
+              <button
+                onClick={handleLogout}
+                className="hover:text-red-400 transition"
               >
-                {label}
-                <span className="block h-0.5 bg-gradient-to-r from-purple-500 to-blue-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-              </Link>
+                Logout
+              </button>
             </li>
-          ))}
-        </ul>
+          </ul>
+        )}
       </div>
-    </motion.nav>
+    </nav>
   );
 }
