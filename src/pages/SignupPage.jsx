@@ -15,8 +15,7 @@ export default function SignupPage() {
     e.preventDefault();
     try {
       await register(form);
-      if (form.role === 'customer') navigate('/customer');
-      else if (form.role === 'partner') navigate('/delivery');
+      navigate('/');
     } catch (err) {
       alert('Signup failed');
     }

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import api from "../services/api";
 import OrderCard from "../components/OrderCard";
-import socket from "../socket"; // shared socket instance
+import socket from "../socket"; 
 
 export default function CustomerDashboard() {
   const [orders, setOrders] = useState([]);
@@ -19,7 +19,7 @@ export default function CustomerDashboard() {
     fetchOrders();
 
     const handleUpdate = ({ orderId, status }) => {
-      console.log("🔄 Received socket update:", orderId, status);
+
 
       setOrders((prev) =>
         prev.map((o) =>
@@ -36,6 +36,7 @@ export default function CustomerDashboard() {
   }, []);
 
   const activeOrders = orders.filter((order) => order.status !== "delivered");
+
   const deliveredOrders = orders.filter(
     (order) => order.status === "delivered"
   );
@@ -78,7 +79,6 @@ export default function CustomerDashboard() {
           )}
         </div>
 
-        {/* ✅ Delivered Orders */}
         <div>
           <h3 className="text-2xl font-semibold text-green-400 mb-4">
             ✅ Delivered Orders

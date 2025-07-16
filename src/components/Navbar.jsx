@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  console.log("Navbar user:", user);
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -18,7 +18,7 @@ export default function Navbar() {
         handleLogout();
       }
     } else {
-      navigate("/"); // if not logged in
+      navigate("/"); 
     }
   };
 
@@ -53,17 +53,7 @@ export default function Navbar() {
                   </Link>
                 </li>
               </>
-            )}
-
-            {user.role === "admin" && (
-              <li>
-                <Link to="/admin" className="hover:text-purple-400 transition">
-                  Admin Panel
-                </Link>
-              </li>
-            )}
-
-            {/* ✅ Common Logout for all roles */}
+            )}  
             <li>
               <button
                 onClick={handleLogout}

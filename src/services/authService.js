@@ -6,11 +6,11 @@ export const login = async (email, password) => {
   const token = res.data.token;
   localStorage.setItem("token", token);
 
-  // 🔍 Decode the token to extract user info
-  const user = jwtDecode(token); // user.role is now available
+
+  const user = jwtDecode(token); 
   localStorage.setItem("user", JSON.stringify(user));
 
-  return user; // contains role: 'admin' | 'customer' | 'partner'
+  return user; 
 };
 
 export const register = async (data) => {

@@ -2,9 +2,13 @@ import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import api from "../services/api";
 import socket from "../socket.js";
+import Modal from "../components/Modal";
 
 export default function ProductCatalog() {
   const [products, setProducts] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [orderedProduct, setOrderedProduct] = useState(null);
+
 
   useEffect(() => {
     fetchProducts();
@@ -13,9 +17,9 @@ export default function ProductCatalog() {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get("http://localhost:5000/api/products");
+      const response = await api.get("/products");
       setProducts(response.data);
-      console.log("Products fetched:", response.data);
+
     } catch (err) {
       console.error("Failed to fetch products:", err);
       alert("❌ Failed to load products");
@@ -27,16 +31,17 @@ export default function ProductCatalog() {
     try {
       const token = localStorage.getItem("token");
       const res = await api.post(
-        "/orders/BuyOrder",
+        "orders/BuyOrder",
         {
           productId: product._id,
           productName: product.title,
           productPrice: product.price,
+          productImage: product.thumbnail,
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      alert(`✅ Order placed for: ${product.title}`);
+      setShowModal(true);
+      setOrderedProduct(product);
     } catch (err) {
       console.error("Order failed:", err);
       alert("❌ Failed to place order");
@@ -56,6 +61,12 @@ export default function ProductCatalog() {
           ))}
         </div>
       </div>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="🎉 Order Placed"
+        message={`Your order for "${orderedProduct?.title}" has been placed successfully!`}
+      />
     </section>
   );
 }

@@ -2,11 +2,14 @@ import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import api from "../services/api";
 import socket from "../socket"; // shared socket instance
+import Modal from "../components/Modal";
 
 export default function DeliveryDashboard() {
   const [orders, setOrders] = useState([]);
   const incomingOrdersRef = useRef([]); // store incoming new orders
   const orderIdsRef = useRef(new Set());
+  const [showModal, setShowModal] = useState(false);
+
 
   useEffect(() => {
     let isMounted = true;
@@ -33,7 +36,7 @@ export default function DeliveryDashboard() {
     });
 
     socket.on("newOrder", (order) => {
-      console.log("📬 Received newOrder:", order);
+
 
       setOrders((prevOrders) => {
         const alreadyExists = prevOrders.some(
@@ -41,7 +44,7 @@ export default function DeliveryDashboard() {
         );
 
         if (alreadyExists) {
-          console.log("⚠️ Duplicate order skipped:", order._id);
+
           return prevOrders;
         }
 
@@ -76,17 +79,18 @@ export default function DeliveryDashboard() {
             : order
         )
       );
-      console.log("✅ Updated Order Received:", updatedOrder);
+
 
       socket.emit("joinOrderRoom", { orderId }); // optional: join after accepting
-      alert("Order accepted");
+      setShowModal(true);
+
     } catch (err) {
       alert("Order already taken");
     }
   };
 
   const handleStatusChange = (orderId, status) => {
-    console.log("Updating order status:", orderId, status);
+
     socket.emit("updateOrderStatus", { orderId, status });
   };
 
@@ -216,6 +220,12 @@ export default function DeliveryDashboard() {
           )}
         </div>
       </motion.div>
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="🎉 Order Placed"
+        message={`Order has been accepted successfully!`}
+      />
     </section>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
 import socket from '../socket';
 import { motion } from 'framer-motion';
@@ -6,21 +6,22 @@ import { motion } from 'framer-motion';
 export default function AdminDashboard() {
   const [orders, setOrders] = useState([]);
   const [partners, setPartners] = useState([]);
+  const orderIdsRef = useRef(new Set());
 
   useEffect(() => {
-    // Fetch all orders
+
     api.get('/admin/orders').then(res => {
       setOrders(res.data);
-      console.log('📦 Orders fetched:', res.data);
+
       res.data.forEach(order => {
         socket.emit('joinOrderRoom', { orderId: order._id });
       });
     });
 
-    // Fetch delivery partners
+
     api.get('/admin/partners').then(res => setPartners(res.data));
 
-    // Socket listener for status updates
+
     socket.on('orderStatusUpdate', ({ orderId, status }) => {
       setOrders(prev =>
         prev.map(order =>
@@ -29,8 +30,30 @@ export default function AdminDashboard() {
       );
     });
 
+    socket.on("newOrder", (order) => {
+
+
+      setOrders((prevOrders) => {
+        const alreadyExists = prevOrders.some(
+          (o) => o._id.toString() === order._id.toString()
+        );
+
+        if (alreadyExists) {
+          return prevOrders;
+        }
+
+        orderIdsRef.current.add(order._id.toString());
+
+        const updatedOrders = [...prevOrders, order].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        return updatedOrders;
+      });
+    });
+
     return () => {
       socket.off('orderStatusUpdate');
+      socket.off('newOrder');
     };
   }, []);
 
@@ -63,7 +86,7 @@ export default function AdminDashboard() {
               <tbody>
                 {orders.map(order => (
                   <tr key={order._id} className="border-t border-gray-700">
-                    <td className="px-4 py-2">{order._id.slice(-6).toUpperCase()}</td>
+                    <td className="px-4 py-2">{order.productId.slice(-6).toUpperCase()}</td>
                     <td className="px-4 py-2">{order.productName}</td>
                     <td className="px-4 py-2">{order.customerId?.name || 'N/A'}</td>
                     <td className="px-4 py-2">{order.partnerId?.name || 'Unassigned'}</td>

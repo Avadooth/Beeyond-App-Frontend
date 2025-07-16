@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { login as loginService } from "../services/authService"; // ✅ Rename here
+import { login as loginService } from "../services/authService"; 
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ Don't forget this import
+import { useAuth } from "../context/AuthContext"; 
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
-  const { login: setUserInContext } = useAuth(); // ✅ rename to avoid conflict
+  const { login: setUserInContext } = useAuth(); 
 
   const handleLogin = async () => {
     try {
-      const user = await loginService(email, password); // decoded token
-      setUserInContext(user); // store user in context
-      console.log("User logged in:", user);
+      const user = await loginService(email, password); 
+      setUserInContext(user); 
+
 
       // 🔁 Redirect based on role
       if (user.role === "admin") navigate("/admin");
