@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import api from "../services/api";
-import socket from "../socket"; // shared socket instance
+import socket from "../socket.js"; // shared socket instance
 import Modal from "../components/Modal";
 
 export default function DeliveryDashboard() {

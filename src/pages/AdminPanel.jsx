@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import api from '../services/api';
-import socket from '../socket';
+import socket from '../socket.js';
 import { motion } from 'framer-motion';
 
 export default function AdminDashboard() {

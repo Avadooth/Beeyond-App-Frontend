@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import api from "../services/api";
 import OrderCard from "../components/OrderCard";
-import socket from "../socket"; 
+import socket from "../socket.js"; 
 
 export default function CustomerDashboard() {
   const [orders, setOrders] = useState([]);
