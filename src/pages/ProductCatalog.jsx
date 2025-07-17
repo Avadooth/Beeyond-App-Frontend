@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ProductCard from "../components/ProductCard";
 import api from "../services/api";
-import socket from "../socket.js";
+// import socket from "../socket.js";
 import Modal from "../components/Modal";
 
 export default function ProductCatalog() {
